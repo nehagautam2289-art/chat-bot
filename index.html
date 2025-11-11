@@ -80,14 +80,7 @@
       if (userText === "") return;
       appendMessage(userText, "user");
       userInput.value = "";
-
-      // fake bot reply (demo purpose)
-      setTimeout(() => {
-        const botReply = "🤖: " + getBotReply(userText);
-        appendMessage(botReply, "bot");
-      }, 1000);
-    });
-
+      
     function appendMessage(text, sender) {
       const msgDiv = document.createElement("div");
       msgDiv.classList.add("message", sender);
@@ -105,3 +98,56 @@
   </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI ChatBot</title>
+  <style>
+    body { background: #0f111a; color: #fff; font-family: Arial; text-align: center; }
+    h1 { color: #4da6ff; }
+    .chat-box { width: 90%; max-width: 400px; margin: 30px auto; background: #1a1d29; border-radius: 10px; padding: 15px; }
+    .msg { text-align: left; margin: 8px 0; padding: 10px; border-radius: 8px; }
+    .user { background: #2d8a2d; }
+    .bot { background: #333; }
+    input { width: 75%; padding: 10px; border: none; border-radius: 6px; }
+    button { padding: 10px 15px; border: none; background: #4da6ff; color: white; border-radius: 6px; margin-left: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>🤖 AI ChatBot</h1>
+  <div class="chat-box" id="chatBox"></div>
+  <input type="text" id="userInput" placeholder="Type your message...">
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chatBox = document.getElementById("chatBox");
+      const userMsg = input.value.trim();
+      if (!userMsg) return;
+
+      chatBox.innerHTML += `<div class="msg user">${userMsg}</div>`;
+      input.value = "";
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer YOUR_OPENAI_API_KEY"
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: userMsg }]
+        })
+      });
+
+      const data = await response.json();
+      const reply = data.choices?.[0]?.message?.content || "⚠️ Error: No response!";
+      chatBox.innerHTML += `<div class="msg bot">${reply}</div>`;
+    }
+  </script>
+</body>
+</html>
+
